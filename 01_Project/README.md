@@ -34,11 +34,11 @@ Fetches the top 10 latest news stories.
 
 | Option | Alias | Description | Example |
 |--------|-------|-------------|---------|
-| `-s, --search <query>` | Search for news by keyword | `node cli.js -s "AI"` |
-| `-t, --topic <topic>` | Filter by topic | `node cli.js -t technology` |
-| `-l, --limit <number>` | Limit results (max 100) | `node cli.js -l 20` |
-| `-u, --url` | Show full URLs | `node cli.js -u` |
-| `-h, --help` | Display help message | `node cli.js -h` |
+| `-s, --search <query>` | Search for news by keyword | Search Google News for a query | `node cli.js -s "AI"` |
+| `-t, --topic <topic>` | Filter by topic | Show news for a specific category | `node cli.js -t technology` |
+| `-l, --limit <number>` | Limit results (max 100) | Restrict number of articles returned | `node cli.js -l 20` |
+| `-u, --url` | Show full URLs | Display article links in output | `node cli.js -u` |
+| `-h, --help` | Display help message | Show CLI usage information | `node cli.js -h` |
 
 ### Available Topics
 
