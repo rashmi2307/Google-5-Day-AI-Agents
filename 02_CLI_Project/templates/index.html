@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Pulse</title>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar or Header section -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-glow"></div>
+                <div class="logo-icon">BQ</div>
+                <div class="brand-text">
+                    <h1>BigQuery Release Pulse</h1>
+                    <p class="subtitle">Real-time updates & social composer</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button id="refresh-btn" class="btn btn-primary" title="Refresh Release Notes">
+                    <svg class="icon spinner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                    </svg>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Layout -->
+        <main class="app-content">
+            <!-- Left Side: Controls & Feed -->
+            <section class="feed-section">
+                <!-- Dashboard Statistics Card -->
+                <div class="stats-panel">
+                    <div class="stat-card">
+                        <span class="stat-label">Total Updates</span>
+                        <span id="stat-total" class="stat-value">-</span>
+                    </div>
+                    <div class="stat-card feature-stat">
+                        <span class="stat-label">Features</span>
+                        <span id="stat-features" class="stat-value">-</span>
+                    </div>
+                    <div class="stat-card change-stat">
+                        <span class="stat-label">Changes</span>
+                        <span id="stat-changes" class="stat-value">-</span>
+                    </div>
+                    <div class="stat-card breaking-stat">
+                        <span class="stat-label">Breaking / Issues</span>
+                        <span id="stat-breaking" class="stat-value">-</span>
+                    </div>
+                </div>
+
+                <!-- Filters & Search Toolbar -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="search-input" placeholder="Search updates (e.g. Gemini, external, CDC)..." autocomplete="off">
+                    </div>
+                    
+                    <div class="filters">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="feature">Features</button>
+                        <button class="filter-btn" data-filter="change">Changes</button>
+                        <button class="filter-btn" data-filter="breaking">Breaking</button>
+                        <button class="filter-btn" data-filter="announcement">Announcements</button>
+                    </div>
+                </div>
+
+                <!-- Feed Container -->
+                <div id="notes-feed" class="notes-feed">
+                    <!-- Skeleton loading cards -->
+                    <div class="skeleton-card">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line title"></div>
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line title"></div>
+                        <div class="skeleton-line"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line title"></div>
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Tweet Composer (Sticky Panel) -->
+            <section class="composer-section">
+                <div class="composer-container sticky-panel">
+                    <div class="composer-header">
+                        <h2>Tweet Composer</h2>
+                        <span class="composer-subtitle">Draft your update for X / Twitter</span>
+                    </div>
+                    
+                    <div id="composer-placeholder" class="composer-placeholder">
+                        <div class="placeholder-graphic">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+                            </svg>
+                        </div>
+                        <p>Select any release update card from the feed to compose a Tweet about it.</p>
+                    </div>
+
+                    <div id="composer-body" class="composer-body hidden">
+                        <div class="selected-note-preview">
+                            <span id="preview-type-badge" class="badge">Feature</span>
+                            <span id="preview-date" class="preview-date">June 15, 2026</span>
+                            <div id="preview-text" class="preview-html"></div>
+                        </div>
+
+                        <div class="text-editor-container">
+                            <label for="tweet-textarea">Compose Tweet</label>
+                            <textarea id="tweet-textarea" rows="6" maxlength="280"></textarea>
+                            <div class="textarea-footer">
+                                <div class="composer-actions-left">
+                                    <button id="btn-shorten" class="btn btn-secondary btn-xs" title="Shorten content to fit character limit">
+                                        ✨ Auto-Shorten
+                                    </button>
+                                    <button id="btn-reset" class="btn btn-link btn-xs">Reset text</button>
+                                </div>
+                                <div id="char-counter" class="char-counter">0 / 280</div>
+                            </div>
+                        </div>
+
+                        <div class="composer-actions">
+                            <button id="copy-tweet-btn" class="btn btn-secondary btn-full">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span>Copy Text</span>
+                            </button>
+                            <button id="tweet-btn" class="btn btn-twitter btn-full">
+                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                                <span>Post on X</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
